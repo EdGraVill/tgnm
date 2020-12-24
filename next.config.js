@@ -1,7 +1,7 @@
 module.exports = (phase, { defaultConfig }) => ({
   ...defaultConfig,
   i18n: {
-    locales: ['en-US'],
-    defaultLocale: 'en-US',
+    locales: process.env.LOCALES.split(',').map((locale) => locale.trim()),
+    defaultLocale: process.env.DEFAULT_LOCALE,
   },
 });

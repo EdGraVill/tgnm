@@ -2,7 +2,7 @@
   "name": "tgnm",
   "version": "0.1.0",
   "scripts": {
-    "dev": "npx path-exists-cli .env && next dev || echo \"Create .env file based on .env.template\"",
+    "dev": "node ./validateDev.js && next dev",
     "build": "next build",
     "start": "next start"
   },
@@ -31,6 +31,7 @@
     "@types/validator": "^13.1.1",
     "@typescript-eslint/eslint-plugin": "^4.10.0",
     "@typescript-eslint/parser": "^4.10.0",
+    "chalk": "^4.1.0",
     "eslint": "^7.16.0",
     "eslint-config-prettier": "^7.1.0",
     "eslint-plugin-prettier": "^3.3.0",
