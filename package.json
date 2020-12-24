@@ -2,7 +2,8 @@
   "name": "tgnm",
   "version": "0.1.0",
   "scripts": {
-    "dev": "node ./validateDev.js && next dev",
+    "predev": "node ./validateDev.js",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
