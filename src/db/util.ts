@@ -1,18 +1,57 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import mongoose, { Document, Model, Schema, SchemaDefinition, SchemaOptions } from 'mongoose';
+import { MongoError } from 'mongodb';
+import mongoose, {
+  Document,
+  Model,
+  NativeError,
+  Schema,
+  SchemaDefinition,
+  SchemaOptions,
+  Error as Errors,
+} from 'mongoose';
 import { ExtractMethods, ExtractStatics, InterfaceToSchema, SchemaLayer } from './types';
 
 export const createSchema = (
   schemaDefinition: InterfaceToSchema<SchemaLayer<Record<string, any>>>,
   options?: Omit<SchemaOptions, 'timestamps'>,
-) =>
-  new Schema(schemaDefinition as SchemaDefinition, {
+  errorMap?: { [code: string]: string },
+) => {
+  const schema = new Schema(schemaDefinition as SchemaDefinition, {
     timestamps: {
       createdAt: 'timestamps.created',
       updatedAt: 'timestamps.updated',
     },
     ...(options || {}),
   });
+
+  schema.post<Document>(
+    /^(save|update.*)$/g,
+    function postModify(err: MongoError, doc: Document, next: (err?: NativeError) => void) {
+      if (err.name === 'ValidationError') {
+        const castedError = (err as unknown) as Errors.ValidationError;
+
+        const naturalLanguageString = Object.values(castedError.errors)
+          .map((err) => err.message)
+          .join('. ');
+
+        next(new Error(naturalLanguageString));
+      } else if (errorMap && errorMap[`${err.code}`]) {
+        next(new Error(errorMap[`${err.code}`]));
+      } else if (errorMap) {
+        for (const messageChunk in errorMap) {
+          if (err.message.includes(messageChunk)) {
+            next(new Error(errorMap[messageChunk]));
+            break;
+          }
+        }
+      } else {
+        next(err);
+      }
+    },
+  );
+
+  return schema;
+};
 
 const schemas = {};
 

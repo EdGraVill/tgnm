@@ -12,11 +12,13 @@
     "express-graphql": "^0.12.0",
     "graphql": "^15.4.0",
     "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.6.3",
     "mongoose": "^5.11.8",
     "next": "10.0.3",
     "node-rsa": "^1.1.1",
     "react": "17.0.1",
-    "react-dom": "17.0.1"
+    "react-dom": "17.0.1",
+    "validator": "^13.5.2"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
@@ -26,6 +28,7 @@
     "@types/node-rsa": "^1.0.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "@types/validator": "^13.1.1",
     "@typescript-eslint/eslint-plugin": "^4.10.0",
     "@typescript-eslint/parser": "^4.10.0",
     "eslint": "^7.16.0",

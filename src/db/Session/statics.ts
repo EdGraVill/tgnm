@@ -2,6 +2,7 @@ import { compare } from 'bcryptjs';
 import { parse, serialize } from 'cookie';
 import { sign, verify } from 'jsonwebtoken';
 import NodeRSA from 'node-rsa';
+import { i18n } from '../../i18n';
 import { getAccountModel } from '../Account';
 import { staticsAdditor } from '../util';
 import { SessionDocument, SessionModel } from './model';
@@ -15,7 +16,7 @@ export const addSessionStatics = staticsAdditor<SessionDocument, SessionModel>({
         console.info('Wrong email');
       }
 
-      throw new Error('Wrong credentials');
+      throw new Error(i18n('db.Session.errors.wrongCredentials'));
     }
 
     const isRightPassword = await compare(credentials.password, Account.password);
@@ -25,7 +26,7 @@ export const addSessionStatics = staticsAdditor<SessionDocument, SessionModel>({
         console.info('Wrong password');
       }
 
-      throw new Error('Wrong credentials');
+      throw new Error(i18n('db.Session.errors.wrongCredentials'));
     }
 
     const keystore = new NodeRSA({ b: 1024 });

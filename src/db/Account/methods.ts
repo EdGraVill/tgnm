@@ -1,4 +1,5 @@
-import { compare } from 'bcryptjs';
+import { compare, hash } from 'bcryptjs';
+import { i18n } from '../../i18n';
 import { isProdEnv } from '../../util';
 import { methodsAdditor } from '../util';
 import { AccountDocument } from './model';
@@ -13,10 +14,22 @@ export const addAccountMethods = methodsAdditor<AccountSchemaType, AccountDocume
         console.log('Wrong password');
       }
 
-      throw new Error('Wrong password');
+      throw new Error(i18n('db.Account.errors.wrongPassword'));
     }
 
-    this.password = newPassword;
+    if (newPassword.length < 8) {
+      throw new Error(i18n('db.Account.errors.passwordRequire8Chars'));
+    }
+
+    if (!/\d/.test(newPassword)) {
+      throw new Error(i18n('db.Account.errors.passwordRequireANumber'));
+    }
+
+    if (!/[A-Z]/.test(newPassword)) {
+      throw new Error(i18n('db.Account.errors.passwordRequireAnUpper'));
+    }
+
+    this.password = await hash(newPassword, 10);
 
     return this.save();
   },
