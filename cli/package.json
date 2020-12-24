@@ -1,0 +1,22 @@
+{
+  "name": "tgnm",
+  "bin": {
+    "tgnm": "./bin/run"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "/bin",
+    "/lib",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json"
+  ],
+  "oclif": {
+    "commands": "./lib/commands",
+    "bin": "tgnm",
+    "plugins": [
+      "@oclif/plugin-help"
+    ]
+  }
+}
