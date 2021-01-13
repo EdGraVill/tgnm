@@ -3,3 +3,4 @@ export { default as getObjectPaths } from './getObjectPaths';
 export * from './arrayUtils';
 
 export const isProdEnv = process.env.NODE_ENV === 'production';
+export const ERROR_SEPARATOR = '}}err{{';

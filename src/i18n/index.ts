@@ -3,8 +3,9 @@
 // Instead use: "yarn tgnm" for locales manipulation
 //
 
+import i18next, { TOptions, StringMap } from 'i18next';
 import { DottedLanguageObjectStringPaths } from '../types';
-import { getObjectPaths } from '../util';
+import { getObjectPaths, isProdEnv } from '../util';
 
 import enUS, { LangType } from './en-US';
 
@@ -14,10 +15,40 @@ const locales = {
   'en-US': async () => (await import('./en-US')).default,
 };
 
-export async function loadLocale(locale: keyof typeof locales) {
-  const language = await locales[locale]();
+export interface Translator {
+  <TInterpolationMap extends Record<string, unknown> = StringMap>(
+    path: LangPath,
+    options?: TOptions<TInterpolationMap>,
+  ): string;
+  (path: LangPath, defaultValue: string): string;
+  <TInterpolationMap extends Record<string, unknown> = StringMap>(
+    path: LangPath,
+    defaultValue?: string,
+    options?: TOptions<TInterpolationMap> | string,
+  ): string;
+}
 
-  return (path: LangPath): string => path.split('.').reduce((prev, curr) => prev[curr], language);
+export async function loadLocale(locale: keyof typeof locales): Promise<Translator> {
+  const language = await locales[locale]();
+  const t = await i18next.init({
+    lng: locale,
+    debug: !isProdEnv,
+    resources: {
+      [locale]: {
+        translation: language,
+      },
+    },
+  });
+
+  function translator<TInterpolationMap extends Record<string, unknown> = StringMap>(
+    path: LangPath,
+    optionsOrDefaultValue?: TOptions<TInterpolationMap> | string,
+    options?: TOptions<TInterpolationMap> | string,
+  ): string {
+    return t(path, optionsOrDefaultValue as string, options);
+  }
+
+  return translator;
 }
 
 export const langPathList = getObjectPaths(enUS);
@@ -30,4 +61,4 @@ export const langPaths = langPathList.reduce(
   {},
 ) as Record<LangPath, string>;
 
-export const i18n = (path: LangPath) => langPaths[path];
+export const i18n: Translator = (...parameters: Parameters<Translator>) => JSON.stringify(parameters);

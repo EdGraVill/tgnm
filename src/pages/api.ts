@@ -2,9 +2,9 @@
 import { graphqlHTTP } from 'express-graphql';
 import { connectToDB, getSessionModel } from '../db';
 import { getSchema } from '../gql';
-import { langPathList, loadLocale } from '../i18n';
+import { LangPath, langPathList, loadLocale } from '../i18n';
 import { CTX } from '../types';
-import { isProdEnv } from '../util';
+import { ERROR_SEPARATOR, isProdEnv } from '../util';
 
 export default async (req: CTX['req'], res: CTX['res']) => {
   await connectToDB();
@@ -17,12 +17,30 @@ export default async (req: CTX['req'], res: CTX['res']) => {
     context: { req, res },
     graphiql: !isProdEnv,
     customFormatErrorFn(error) {
-      if (langPathList.includes(error.message)) {
-        error.message = i18n(error.message as any);
-      } else {
-        console.error(error.message);
-        error.message = i18n('common.unexpectedError');
-      }
+      const messages = error.message.split(ERROR_SEPARATOR);
+
+      error.message = messages
+        .map((message) => {
+          try {
+            const args: Parameters<typeof i18n> = JSON.parse(message);
+
+            if (langPathList.includes(args[0])) {
+              return i18n(...args);
+            }
+
+            console.error(args[0]);
+            return i18n('common.unexpectedError');
+          } catch (error) {
+            if (langPathList.includes(message)) {
+              return i18n(message as LangPath);
+            }
+
+            console.error(message);
+            return i18n('common.unexpectedError');
+          }
+        })
+        .join('. ');
+      error.message += '.';
 
       return error;
     },

@@ -48,7 +48,7 @@ export const accountSchemaDefinition: InterfaceToSchema<AccountSchemaType> = {
 };
 
 export const AccountSchema = createSchema(accountSchemaDefinition, undefined, {
-  'email_1 dup key': i18n('db.Account.errors.emailDuplicated'),
+  'email_1 dup key': (err) => i18n('db.Account.errors.emailDuplicated', { email: (err as any).keyValue.email }),
 });
 
 AccountSchema.pre('save', async function preSave(this: AccountDocument, next) {

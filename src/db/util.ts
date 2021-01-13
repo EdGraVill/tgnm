@@ -9,12 +9,13 @@ import mongoose, {
   SchemaOptions,
   Error as Errors,
 } from 'mongoose';
+import { ERROR_SEPARATOR } from '../util';
 import { ExtractMethods, ExtractStatics, InterfaceToSchema, SchemaLayer } from './types';
 
 export const createSchema = (
   schemaDefinition: InterfaceToSchema<SchemaLayer<Record<string, any>>>,
   options?: Omit<SchemaOptions, 'timestamps'>,
-  errorMap?: { [code: string]: string },
+  errorMap?: Record<string, string | ((error: MongoError) => string)>,
 ) => {
   const schema = new Schema(schemaDefinition as SchemaDefinition, {
     timestamps: {
@@ -32,15 +33,28 @@ export const createSchema = (
 
         const naturalLanguageString = Object.values(castedError.errors)
           .map((err) => err.message)
-          .join('. ');
+          .join(ERROR_SEPARATOR);
 
         next(new Error(naturalLanguageString));
       } else if (errorMap && errorMap[`${err.code}`]) {
-        next(new Error(errorMap[`${err.code}`]));
+        const errorMessage = errorMap[`${err.code}`];
+
+        if (typeof errorMessage === 'string') {
+          next(new Error(errorMessage));
+        } else {
+          next(new Error(errorMessage(err)));
+        }
       } else if (errorMap) {
         for (const messageChunk in errorMap) {
           if (err.message.includes(messageChunk)) {
-            next(new Error(errorMap[messageChunk]));
+            const errorMessage = errorMap[messageChunk];
+
+            if (typeof errorMessage === 'string') {
+              next(new Error(errorMessage));
+            } else {
+              next(new Error(errorMessage(err)));
+            }
+
             break;
           }
         }

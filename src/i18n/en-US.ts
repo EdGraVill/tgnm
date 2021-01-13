@@ -2,7 +2,7 @@ const lang = {
   db: {
     Account: {
       errors: {
-        emailDuplicated: 'Email alredy registered',
+        emailDuplicated: 'Email "{{email}}" alredy registered',
         emailRequired: 'Email required',
         emailInvalid: 'Invalid email',
         passwrodRequired: 'Password required',
