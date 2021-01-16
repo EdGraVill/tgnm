@@ -8,11 +8,13 @@ import { DottedLanguageObjectStringPaths } from '../types';
 import { getObjectPaths, isProdEnv } from '../util';
 
 import enUS, { LangType } from './en-US';
+export type { LangType } from './en-US';
 
 export type LangPath = DottedLanguageObjectStringPaths<LangType>;
 
-const locales = {
+export const locales = {
   'en-US': async () => (await import('./en-US')).default,
+  'es-MX': async () => (await import('./es-MX')).default,
 };
 
 export interface Translator {

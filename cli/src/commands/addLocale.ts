@@ -17,7 +17,7 @@ export const extractVariablesFromEnv = (content: string): { [key: string]: strin
     );
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const jsStringify = (object: Record<string, any>, level = 1) => {
+export const jsStringify = (object: Record<string, any>, preserve = false, level = 1) => {
   let string = '{\n';
 
   const tab = '  '.repeat(level);
@@ -26,9 +26,9 @@ export const jsStringify = (object: Record<string, any>, level = 1) => {
     if (object[key] instanceof Array) {
       string += `${tab}${key}: ${JSON.stringify(object[key])},\n`;
     } else if (typeof object[key] === 'object') {
-      string += `${tab}${key}: ${jsStringify(object[key], level + 1)}`;
+      string += `${tab}${key}: ${jsStringify(object[key], preserve, level + 1)}`;
     } else if (typeof object[key] === 'string') {
-      string += `${tab}${key}: 'Pending translation',\n`;
+      string += `${tab}${key}: '${preserve ? object[key] : 'Pending translation'}',\n`;
     } else {
       string += `${tab}${key}: ${JSON.stringify(object[key])},\n`;
     }
@@ -49,10 +49,11 @@ import { DottedLanguageObjectStringPaths } from '../types';
 import { getObjectPaths, isProdEnv } from '../util';
 
 import ${defaultLocale.replace('-', '')}, { LangType } from './${defaultLocale}';
+export type { LangType } from './${defaultLocale}';
 
 export type LangPath = DottedLanguageObjectStringPaths<LangType>;
 
-const locales = {
+export const locales = {
 ${locales
   .map(
     (locale) =>
@@ -122,6 +123,7 @@ Creating es-MX.ts from en-US.ts
     help: flags.help({ char: 'h' }),
     defaultLocale: flags.boolean({ char: 'D', default: false, description: 'Set this locale as default locale' }),
     force: flags.boolean({ char: 'F', default: false, description: 'Force to re-create files for an existing locale' }),
+    preserve: flags.boolean({ char: 'p', default: false, description: 'Preserve default locale translation text' }),
   };
 
   static args = [{ name: 'locale', required: true }];
@@ -132,7 +134,7 @@ Creating es-MX.ts from en-US.ts
 
     const {
       args: { locale },
-      flags: { force, defaultLocale },
+      flags: { force, defaultLocale, preserve },
     } = this.parse(AddLocale);
 
     const supportedLocales = env.LOCALES.split(',').map((locale) => locale.trim());
@@ -165,10 +167,12 @@ Creating es-MX.ts from en-US.ts
     if (!defaultLocale) {
       newLocaleContent = `import { LangType } from './${env.DEFAULT_LOCALE}';\n\nconst lang: LangType = ${jsStringify(
         defaultLocaleContent,
+        preserve,
       )}\nexport default lang;\n`;
     } else {
       newLocaleContent = `const lang = ${jsStringify(
         defaultLocaleContent,
+        preserve,
       )}\nexport type LangType = typeof lang;\n\nexport default lang;\n`;
     }
 

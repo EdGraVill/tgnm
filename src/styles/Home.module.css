@@ -23,6 +23,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
 .footer img {
@@ -33,6 +34,18 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 2rem;
+}
+
+.footer a > span {
+  color: #0070f3;
+  text-decoration: none;
+}
+
+.footer a > span:hover,
+.footer a > span:focus,
+.footer a > span:active {
+  text-decoration: underline;
 }
 
 .title a {
