@@ -1,5 +1,6 @@
-import { useRouter } from 'next/dist/client/router';
 import Head from 'next/head';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useTranslator } from '../client';
 import styles from '../styles/Home.module.css';
 
@@ -50,13 +51,15 @@ export default function Home() {
       </main>
 
       <footer className={styles.footer}>
-        <a href={locale === 'en-US' ? '/es-MX' : '/'}>
-          {t('client.index.otherLangage')}
-          <span>
-            {globalThis?.location?.href || ''}
-            {locale === 'en-US' ? 'es-MX' : ''}
-          </span>
-        </a>
+        <Link href="/" locale={locale === 'en-US' ? 'es-MX' : 'en-US'}>
+          <a>
+            {t('client.index.otherLangage')}
+            <span>
+              {globalThis?.location?.href || ''}
+              {locale === 'en-US' ? 'es-MX' : ''}
+            </span>
+          </a>
+        </Link>
         <a
           href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
           target="_blank"
