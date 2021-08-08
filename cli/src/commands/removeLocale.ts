@@ -2,7 +2,8 @@ import { Command, flags } from '@oclif/command';
 import { bgGreen, bgRed, bgYellow, black } from 'chalk';
 import { readFile, unlink, writeFile } from 'fs';
 import { promisify } from 'util';
-import { extractVariablesFromEnv, generatei18nTemplateFile } from './addLocale';
+import generatei18nTemplateFile from '../util/generatei18nTemplateFile';
+import { extractVariablesFromEnv } from './addLocale';
 
 export default class RemoveLocale extends Command {
   static description = 'Remove a locale';

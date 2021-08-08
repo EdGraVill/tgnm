@@ -2,7 +2,7 @@
 import { graphqlHTTP } from 'express-graphql';
 import { connectToDB, getSessionModel } from '../db';
 import { getSchema } from '../gql';
-import { LangPath, langPathList, loadLocale } from '../i18n';
+import { availableLocales, defaultLocale, LangPath, langPathList, loadLocale, localeType } from '../i18n';
 import { CTX } from '../types';
 import { ERROR_SEPARATOR, isProdEnv } from '../util';
 
@@ -10,7 +10,11 @@ export default async (req: CTX['req'], res: CTX['res']) => {
   await connectToDB();
   await getSessionModel().restoreSession({ req, res });
 
-  const i18n = await loadLocale(req.query['__nextLocale'] as any);
+  const i18n = await loadLocale(
+    availableLocales.includes(req.headers['accept-language'] as localeType)
+      ? (req.headers['accept-language'] as localeType)
+      : defaultLocale,
+  );
 
   return graphqlHTTP({
     schema: getSchema({ req, res }),

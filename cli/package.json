@@ -1,5 +1,6 @@
 {
   "name": "tgnm",
+  "description": "tgnm cli project manager",
   "bin": {
     "tgnm": "./bin/run"
   },

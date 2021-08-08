@@ -29,7 +29,7 @@ export const createSchema = (
     /^(save|update.*)$/g,
     function postModify(err: MongoError, doc: Document, next: (err?: NativeError) => void) {
       if (err.name === 'ValidationError') {
-        const castedError = (err as unknown) as Errors.ValidationError;
+        const castedError = err as unknown as Errors.ValidationError;
 
         const naturalLanguageString = Object.values(castedError.errors)
           .map((err) => err.message)
@@ -69,28 +69,30 @@ export const createSchema = (
 
 const schemas = {};
 
-export const modelGetter = <D extends Document, M extends Model<D>>(modelName: string, schema: Schema) => (): M => {
-  if (process.env.NODE_ENV !== 'production') {
-    schemas[modelName] = schema;
+export const modelGetter =
+  <D extends Document, M extends Model<D>>(modelName: string, schema: Schema) =>
+  (): M => {
+    if (process.env.NODE_ENV !== 'production') {
+      schemas[modelName] = schema;
 
-    // This will help for development & testing process
-    delete mongoose.models[modelName];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    delete (mongoose as any).modelSchemas[modelName];
+      // This will help for development & testing process
+      delete mongoose.models[modelName];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (mongoose as any).modelSchemas[modelName];
 
-    Object.keys(schemas).forEach((mn) => {
-      mongoose.model(mn, schemas[mn]);
-    });
-  }
+      Object.keys(schemas).forEach((mn) => {
+        mongoose.model(mn, schemas[mn]);
+      });
+    }
 
-  try {
-    const Model = mongoose.model(modelName) as M;
+    try {
+      const Model = mongoose.model(modelName) as M;
 
-    return Model;
-  } catch (error) {
-    return mongoose.model<D, M>(modelName, schema) as M;
-  }
-};
+      return Model;
+    } catch (error) {
+      return mongoose.model<D, M>(modelName, schema) as M;
+    }
+  };
 
 export const connectToDB = async (): Promise<void> => {
   const isAlreadyConnected = (global as any).mongoConnection;
@@ -105,7 +107,7 @@ export const connectToDB = async (): Promise<void> => {
     const connection = await mongoose.connect(process.env.DB_HOST, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-    });
+    } as any);
 
     (global as any).mongoConnection = connection;
 

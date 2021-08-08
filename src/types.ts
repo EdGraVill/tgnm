@@ -26,3 +26,10 @@ type Join<T extends string[], D extends string> = T extends []
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type DottedLanguageObjectStringPaths<O extends Record<string, any>> = Join<PathsToStringProps<O>, '.'>;
+
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
+type LastOf<T> = UnionToIntersection<T extends any ? () => T : never> extends () => infer R ? R : never;
+type Push<T extends any[], V> = [...T, V];
+export type TuplifyUnion<T, L = LastOf<T>, N = [T] extends [never] ? true : false> = true extends N
+  ? []
+  : Push<TuplifyUnion<Exclude<T, L>>, L>;

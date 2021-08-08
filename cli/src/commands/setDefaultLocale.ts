@@ -2,7 +2,8 @@ import { Command, flags } from '@oclif/command';
 import { bgGreen, bgRed, bgYellow, black } from 'chalk';
 import { readdir, readFile, writeFile } from 'fs';
 import { promisify } from 'util';
-import { extractVariablesFromEnv, generatei18nTemplateFile } from './addLocale';
+import generatei18nTemplateFile from '../util/generatei18nTemplateFile';
+import { extractVariablesFromEnv } from './addLocale';
 
 export default class SetDefaultLocale extends Command {
   static description = 'Set a default locale';
